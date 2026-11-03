@@ -2,6 +2,11 @@
 
 Run with `npm run dev`; build with `npm run build`.
 
+## Publishing on GitHub Pages
+The GitHub Actions workflow builds and publishes the game when `main` or `arena/427fde5c-hexfield` is pushed. Both branches publish to the same live site. In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. GitHub Pages must be available for the repository's visibility and account plan; on GitHub Free, the repository must be public. If the first workflow ran before Pages was enabled, re-run it from the **Actions** tab. The website is public even when Pages is enabled for a private repository.
+
+The workflow builds for the project URL `/Hexfield/`. No generated files need to be committed. For a manual static deployment, run `npm run build` and upload the `dist` folder instead.
+
 ## Simulation (combat + AI)
 - Combat is **simultaneous only**. All attacks resolve before movement: a targeted unit cannot retreat, mutual attacks kill both, and two units targeting one tile cancel. A unit may move onto a tile vacated by an ally in the same round; movement chains resolve in dependency order.
 - AI: three-move selective lookahead for both sides, memoized rollouts, seeded self-play diversity. Settlers value founding cities; armies value capitals and city pressure.
