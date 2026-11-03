@@ -11,13 +11,14 @@ import { RunControls } from './components/RunControls';
 import { DuelTable, EconomyTable, GameFlow, MatchupMatrix, OutcomeBar, RosterTable, type SortBy } from './components/ResultsContent';
 import { findings, percent, verdict } from './sim/analysis';
 import {
-  adaptLearningToPatterns, buildGamePlan, emptyStats, ensureStatsShape, initialLearning, isLearningState, mergeStats, runBatch, runTraining,
+  adaptLearningToPatterns, buildGamePlan, emptyStats, ensureStatsShape, initialLearning, isHistoricalStudy, isLearningState,
+  mergeStats, runBatch, runTraining, STUDY_RULES_VERSION,
   type BatchResult, type BatchStats, type LearningState, type Progress, type RunSettings,
   type SliceResult, type TrainingTrial, type TrialExecutor,
 } from './sim/batch';
 import { createPool, type SimPool } from './sim/pool';
 import { createScenario, setProfileOverlays, snapshot, type BoardSnapshot } from './sim/engine';
-import { captureRuleset, loadCustomization, patternFingerprint } from './sim/config';
+import { captureRuleset, loadCustomization } from './sim/config';
 import type { PatternId } from './sim/patterns';
 import baselineData from './data/baseline.json';
 import simultaneousData from './data/baseline-simultaneous.json';
@@ -108,7 +109,7 @@ export default function App() {
   const live = running && !!progress?.stats;
   const stats = live && progress?.stats ? progress.stats : current.stats;
   const shownSettings = live && activeSettings ? activeSettings : current.settings;
-  const historical = !live && current.learning?.patternFingerprint !== patternFingerprint();
+  const historical = !live && isHistoricalStudy(current);
   const activeFindings = useMemo(() => findings(stats, shownSettings), [stats, shownSettings]);
   const judgment = useMemo(() => verdict(stats), [stats]);
   const usableGames = Number.isFinite(settings.games) ? Math.max(100, Math.min(5000, Math.round(settings.games))) : 500;
@@ -188,7 +189,7 @@ export default function App() {
         return {
           settings: next, stats, learning: champion, training: training.training,
           preview: lastPreview ?? snapshot(createScenario(next.seed, { stage: 8, mode: next.mode })),
-          generatedAt: new Date().toISOString(), durationMs: Date.now() - started,
+          generatedAt: new Date().toISOString(), durationMs: Date.now() - started, studyRulesVersion: STUDY_RULES_VERSION,
         };
       } catch (error) {
         if (cancelRef.current) return null;

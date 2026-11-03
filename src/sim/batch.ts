@@ -70,6 +70,10 @@ export type SliceResult = {
   completed: number;
 };
 
+// Studies produced before newly founded cities start empty used different rules.
+// Version results separately from learned pattern weights so neither is discarded.
+export const STUDY_RULES_VERSION = 2;
+
 export type BatchResult = {
   settings: RunSettings;
   stats: BatchStats;
@@ -78,7 +82,12 @@ export type BatchResult = {
   preview: BoardSnapshot;
   generatedAt: string;
   durationMs: number;
+  studyRulesVersion?: number; // absent in older saved studies
 };
+
+export function isHistoricalStudy(result: Pick<BatchResult, 'studyRulesVersion' | 'learning'>): boolean {
+  return result.studyRulesVersion !== STUDY_RULES_VERSION || result.learning?.patternFingerprint !== patternFingerprint();
+}
 
 export type Progress = {
   phase: 'training' | 'rosters' | 'duels';
@@ -493,7 +502,7 @@ export async function runBatch(
   if (!slice) return null;
   return {
     settings, stats: slice.stats, learning: training.learning, training: training.training,
-    preview: slice.preview, generatedAt: new Date().toISOString(), durationMs: Date.now() - started,
+    preview: slice.preview, generatedAt: new Date().toISOString(), durationMs: Date.now() - started, studyRulesVersion: STUDY_RULES_VERSION,
   };
 }
 
