@@ -3,7 +3,7 @@
 Run with `npm run dev`; build with `npm run build`.
 
 ## Publishing on GitHub Pages
-The GitHub Actions workflow builds and publishes the game when `main` or `arena/427fde5c-hexfield` is pushed. Both branches publish to the same live site. In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. GitHub Pages must be available for the repository's visibility and account plan; on GitHub Free, the repository must be public. If the first workflow ran before Pages was enabled, re-run it from the **Actions** tab. The website is public even when Pages is enabled for a private repository.
+The GitHub Actions workflow checks the build when `main` or `arena/427fde5c-hexfield` is pushed. Only `main` publishes the game to the live site, following the `github-pages` environment's branch protection. In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. GitHub Pages must be available for the repository's visibility and account plan; on GitHub Free, the repository must be public. If a workflow ran before Pages was enabled, re-run it from the **Actions** tab. The website is public even when Pages is enabled for a private repository.
 
 The workflow builds for the project URL `/Hexfield/`. No generated files need to be committed. For a manual static deployment, run `npm run build` and upload the `dist` folder instead.
 
