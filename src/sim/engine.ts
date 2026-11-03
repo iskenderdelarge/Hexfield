@@ -475,11 +475,11 @@ export function executeFoundCity(state: GameState, settler: Unit): City | null {
   return newCity;
 }
 
-export function processCityProduction(state: GameState): { city: City; unit: Unit }[] {
+export function processCityProduction(state: GameState, cities = state.cityEntities): { city: City; unit: Unit }[] {
   const spawned: { city: City; unit: Unit }[] = [];
   const occupied = occupancy(state);
 
-  for (const city of state.cityEntities) {
+  for (const city of cities) {
     normalizeProduction(city);
     if (city.productionProgress === 0 && state.players[city.owner]?.isAi) {
       const pool = PATTERNS.filter((pattern) => pattern.id !== 'settler');
@@ -723,6 +723,9 @@ export function resolveSimultaneous(state: GameState, orders: Action[], observe?
   if (attacks.length) observe?.('attack', state, attacks.map(({ action }) => action));
   if (state.finished) return;
 
+  // Only cities that existed before this round's founding phase earn production.
+  const producingCities = state.cityEntities.slice();
+
   // SPECIAL ACTIONS (Found a City for Settlers)
   for (const action of orders) {
     if (action.kind === 'special' && action.specialAction === 'found_city') {
@@ -809,7 +812,7 @@ export function resolveSimultaneous(state: GameState, orders: Action[], observe?
 
   // Post-move captures & city production
   processCityCaptures(state);
-  processCityProduction(state);
+  processCityProduction(state, producingCities);
   checkVictory(state);
 }
 
